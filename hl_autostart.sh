@@ -136,6 +136,8 @@ ha set window_border_normal_color "#$col_inactive"
 ha set window_border_active_color "#$col_hl"
 ha set always_show_frame 1
 ha set frame_gap 0
+# vertical split
+hc set default_frame_layout 1
 # add overlapping window borders
 ha set window_gap -2
 ha set frame_padding 2
