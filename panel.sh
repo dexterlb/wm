@@ -40,6 +40,13 @@ function join {
     done
 }
 
+function watchloop {
+    while true; do
+        ${@:2}
+        sleep ${1} || break
+    done > >(uniq_linebuffered)
+}
+
 herbstclient pad $monitor $pa_height
 {
     # events:
@@ -75,25 +82,13 @@ herbstclient pad $monitor $pa_height
     } 3>&1 2>/dev/null &
     childpids+=( $! )
 
-    # battery loop:
-    while true ; do
-        get_battery 1
-        sleep 1 || break
-    done > >(uniq_linebuffered)  &
+    watchloop 2 get_battery 1 &
     childpids+=( $! )
 
-    # clock loop:
-    while true ; do
-        get_binclock
-        sleep 1 || break
-    done > >(uniq_linebuffered)  &
+    watchloop 5 get_binclock &
     childpids+=( $! )
 
-    # loadavg loop:
-    while true ; do
-        get_loadavg
-        sleep 5 || break
-    done > >(uniq_linebuffered)  &
+    watchloop 5 get_loadavg &
     childpids+=( $! )
 
     herbstclient --idle
