@@ -236,7 +236,7 @@ herbstclient pad $monitor $pa_height
                 ;;
             mpd)
                 mpd_str="${cmd[@]:1}"
-                echo "mpd: ${mpd_str}"
+                echo "mpd: ${mpd_str}" >&2
                 ;;
         esac
     done
