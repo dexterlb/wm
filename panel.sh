@@ -65,11 +65,11 @@ herbstclient pad $monitor $pa_height
         while true; do
             echo "player event"
             mpc -h "${mpd_host}" -p "${mpd_port}" idleloop
-            echo "player dc" >&3
+            get_mpd dc >&3
             sleep 8 || break        # fail/disconnect retry timeout
         done | while true; do
             head -1 > /dev/null     # wait for event
-            echo "player event"
+            get_mpd event
             sleep 0.5 || break      # min time between updates
         done 
     } 3>&1 2>/dev/null &
@@ -105,8 +105,8 @@ herbstclient pad $monitor $pa_height
     visible=true
     loadavg=""
     date=""
+    mpd_str=""
     notification=""
-    m_status='dc'
     windowtitle=""
     bordercolor="#$pa_outl"
     separator="$(dclr ${pa_hl})|$(dclr)"
@@ -157,7 +157,7 @@ herbstclient pad $monitor $pa_height
         if [[ -n "${notification}" ]]; then
             right="${notification} ";
         else
-            right="${m_str} ${date} ${battery} ${loadavg} "
+            right="${mpd_str} ${date} ${battery} ${loadavg} "
         fi
 
         rightwidth=$(pawidth "${right}")
@@ -234,48 +234,9 @@ herbstclient pad $monitor $pa_height
                 notification="${cmd[@]:1}"
                 echo "notif: ${notification}" >&2
                 ;;
-            player)
-                case "${cmd[2]}" in
-                    dc)
-                        echo "player dc" >&2
-                        m_status='dc'
-                        ;;
-                    event)
-                        hr="$(mpc -h "$mpd_host" -p "$mpd_port" | tail -2)"
-                        if [[ $? != 0 ]]; then
-                            m_status='dc'
-                        else
-                            echo "$hr" | head -1 | perl -ne 'if ($_ =~ /(^\[)([^\]]+)(\].*)/) {print "$2\n"} else {print "stopped\n"}' \
-                                | read m_status
-                            echo "$hr" | tail -1 | perl -ne 'if ($_ =~ /(^volume\:\s*)([0-9]+)(\%.*)/) {print "$2\n"} else {print "0\n"}' \
-                                | read m_volume
-                            # echo "$hr" | head -1 | perl -ne 'if ($_ =~ /(.+)([0-9]+\:[0-9]+)(\/)([0-9]+\:[0-9]+)/) {print "$2\n$4\n"} else {print "0\n0\n"}' \
-                            #     | {read m_time_now; read m_time_total}
-                            mpc -h "${mpd_host}" -p "${mpd_port}" -f '%artist%\n%album%\n%title%' current \
-                                | {read m_artist ; read m_album ; read m_title}
-
-                            if [[ ${m_status} == "stopped" ]]; then
-                                m_str="DON'T PANIC!"
-                            elif [[ ${m_status} == "dc" ]]; then
-                                m_str="PANIC!"
-                            elif [[ ${m_status} =~ "(playing|paused)" ]]; then
-                                #staticon="^i(${bakeddir}/m_${m_status}.xpm)"
-                                if [[ ${m_status} == "playing" ]]; then
-                                    statclr="$(dclr ${pa_hl})"
-                                else
-                                    statclr="$(dclr)"
-                                fi
-                                volume="$(echo "${m_volume}" | gdbar -s -o -w 40 -h 10 -nonl -bg "#${pa_inactive[1]}" -fg "#${pa_active[1]}")"
-                                m_str="$(dclr ${pa_hl})${staticon}$(dclr) $(mpd_trim "${m_artist}") - ${statclr}$(mpd_trim ${m_title} "${statclr}")$(dclr) ${volume}"
-                                #m_str="${staticon} $(mpd_trim "${m_artist}") - $(dclr ${pa_hl})$(mpd_trim ${m_title} "$(dclr ${pa_hl})")$(dclr) ${volume}"
-                            else
-                                m_str="fixme..."
-                            fi
-
-                        fi
-                        echo "player event: $m_str" >&2
-                        ;;
-                esac
+            mpd)
+                mpd_str="${cmd[@]:1}"
+                echo "mpd: ${mpd_str}"
                 ;;
         esac
     done

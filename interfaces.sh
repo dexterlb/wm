@@ -101,6 +101,51 @@ function get_battery {
     fi
 }
 
+function get_mpd {
+    local hr m_{status,volume,artist,album,title,str}
+    case "${1}" in
+        dc)
+            echo "player dc" >&2
+            m_status='dc'
+            ;;
+        event)
+            hr="$(mpc -h "$mpd_host" -p "$mpd_port" | tail -2)"
+            if [[ $? != 0 ]]; then
+                m_status='dc'
+            else
+                echo "$hr" | head -1 | perl -ne 'if ($_ =~ /(^\[)([^\]]+)(\].*)/) {print "$2\n"} else {print "stopped\n"}' \
+                    | read m_status
+                echo "$hr" | tail -1 | perl -ne 'if ($_ =~ /(^volume\:\s*)([0-9]+)(\%.*)/) {print "$2\n"} else {print "0\n"}' \
+                    | read m_volume
+                # echo "$hr" | head -1 | perl -ne 'if ($_ =~ /(.+)([0-9]+\:[0-9]+)(\/)([0-9]+\:[0-9]+)/) {print "$2\n$4\n"} else {print "0\n0\n"}' \
+                #     | {read m_time_now; read m_time_total}
+                mpc -h "${mpd_host}" -p "${mpd_port}" -f '%artist%\n%album%\n%title%' current \
+                    | {read m_artist ; read m_album ; read m_title}
+
+                if [[ ${m_status} == "stopped" ]]; then
+                    m_str="DON'T PANIC!"
+                elif [[ ${m_status} == "dc" ]]; then
+                    m_str="PANIC!"
+                elif [[ ${m_status} =~ "(playing|paused)" ]]; then
+                    #staticon="^i(${bakeddir}/m_${m_status}.xpm)"
+                    if [[ ${m_status} == "playing" ]]; then
+                        statclr="$(dclr ${pa_hl})"
+                    else
+                        statclr="$(dclr)"
+                    fi
+                    volume="$(echo "${m_volume}" | gdbar -s -o -w 40 -h 10 -nonl -bg "#${pa_inactive[1]}" -fg "#${pa_active[1]}")"
+                    m_str="$(dclr ${pa_hl})${staticon}$(dclr) $(mpd_trim "${m_artist}") - ${statclr}$(mpd_trim ${m_title} "${statclr}")$(dclr) ${volume}"
+                    #m_str="${staticon} $(mpd_trim "${m_artist}") - $(dclr ${pa_hl})$(mpd_trim ${m_title} "$(dclr ${pa_hl})")$(dclr) ${volume}"
+                else
+                    m_str="fixme..."
+                fi
+
+            fi
+            ;;
+    esac
+    echo "mpd ${m_str}"
+}
+
 if [[ -n "${1}" ]]; then
     eval "${@}"
 fi
