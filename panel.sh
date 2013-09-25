@@ -2,6 +2,7 @@
 cdir="$(dirname "${0}")"
 monitor=${1:-0}
 . "${cdir}/visual.sh"
+. "${cdir}/interfaces.sh"
 
 ####
 # true if we are using the svn version of dzen2
@@ -12,34 +13,6 @@ if dzen2 -v 2>&1 | head -n 1 | grep -q '^dzen-\([^,]*-svn\|\),'; then
 else
     dzen2_svn=""
 fi
-
-function get_binclock {
-    echo -n "date "
-    "${cdir}/binclock.pl" \
-        "^p(2){}^r(8x8)$(dclr)^p(2)" \
-        "$(dclr ${pa_inactive})" "$(dclr ${pa_active})" \
-        "%4-%3'%5 %2:%1"
-    echo
-}
-
-function get_loadavg {
-    b_state=$(boinccmd --get_cc_status | head -5 | perl -ne 'if (m/^\s+not suspended$/) {print "0\n"} elsif (m/^\s+suspended\: user request$/) {print "1\n"} elsif (m/^\s+suspended/) {print "2\n"}')
-    b_active_jobs=$(boinccmd --get_tasks | perl -ne 'print if /^\s+active_task_state\: 1$/' | wc -l)
-    b_err_jobs=$(boinccmd --get_tasks | perl -ne 'print if /^\s+active_task_state\: [2-9][0-9]*$/' | wc -l)
-    load=$(cat /proc/loadavg | perl -pe 's/\s.+//g')
-    case ${b_state} in
-        0) cload="$(dclr ${pa_hl2})${load}$(dclr)" ;;
-        1) cload="$(dclr)${load}" ;;
-        2) cload="$(dclr ${pa_hl})${load}$(dclr)" ;;
-    esac
-    if [[ ${b_active_jobs} -ne 0 ]]; then
-        cload="${cload} $(dclr ${pa_hl2})(${b_active_jobs})$(dclr)"
-    fi
-    if [[ ${b_err_jobs} -ne 0 ]]; then
-        cload="${cload} $(dclr ${pa_u})[$b_err_jobs]$(dclr)"
-    fi
-    echo "loadavg ${cload}"
-}
 
 function uniq_linebuffered {
     awk -W interactive '$0 != l { print ; l=$0 ; fflush(); }' "$@"
@@ -93,13 +66,20 @@ herbstclient pad $monitor $pa_height
             echo "player event"
             mpc -h "${mpd_host}" -p "${mpd_port}" idleloop
             echo "player dc" >&3
-            sleep 8                 # fail/disconnect retry timeout
+            sleep 8 || break        # fail/disconnect retry timeout
         done | while true; do
             head -1 > /dev/null     # wait for event
             echo "player event"
-            sleep 0.5               # min time between updates
+            sleep 0.5 || break      # min time between updates
         done 
     } 3>&1 2>/dev/null &
+    childpids+=( $! )
+
+    # battery loop:
+    while true ; do
+        get_battery 1
+        sleep 1 || break
+    done > >(uniq_linebuffered)  &
     childpids+=( $! )
 
     # clock loop:
@@ -177,7 +157,7 @@ herbstclient pad $monitor $pa_height
         if [[ -n "${notification}" ]]; then
             right="${notification} ";
         else
-            right="${m_str} ${date} ${loadavg} "
+            right="${m_str} ${date} ${battery} ${loadavg} "
         fi
 
         rightwidth=$(pawidth "${right}")
@@ -246,6 +226,10 @@ herbstclient pad $monitor $pa_height
                 loadavg="${cmd[@]:1}"
                 echo "loadavg: ${loadavg}" >&2
                 ;;
+            bat)
+                battery="${cmd[@]:2}"
+                echo "battery: ${battery}" >&2
+                ;;
             notif)
                 notification="${cmd[@]:1}"
                 echo "notif: ${notification}" >&2
@@ -281,8 +265,8 @@ herbstclient pad $monitor $pa_height
                                 else
                                     statclr="$(dclr)"
                                 fi
-                                volume="$(echo "${m_volume}" | gdbar -s -o -w 30 -h 8 -nonl -bg "#${pa_inactive[1]}" -fg "#${pa_active[1]}")"
-                                m_str="$(dclr ${pa_hl})${staticon}$(dclr) $(mpd_trim "${m_artist}") - ${statclr}$(mpd_trim ${m_title} "$(dclr ${pa_hl})")$(dclr) ${volume}"
+                                volume="$(echo "${m_volume}" | gdbar -s -o -w 40 -h 10 -nonl -bg "#${pa_inactive[1]}" -fg "#${pa_active[1]}")"
+                                m_str="$(dclr ${pa_hl})${staticon}$(dclr) $(mpd_trim "${m_artist}") - ${statclr}$(mpd_trim ${m_title} "${statclr}")$(dclr) ${volume}"
                                 #m_str="${staticon} $(mpd_trim "${m_artist}") - $(dclr ${pa_hl})$(mpd_trim ${m_title} "$(dclr ${pa_hl})")$(dclr) ${volume}"
                             else
                                 m_str="fixme..."

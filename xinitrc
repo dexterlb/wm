@@ -16,7 +16,7 @@ xrdb -merge ~/.Xresources
 
 case "$1" in
     hl) exec herbstluftwm -c "$( readlink -f "${cdir}/hl_autostart.sh")" ;;
-    xmonad) exec "/home/human/.xmonad/scripts/xmonad_session.sh" ;;
+    fluxbox) exec fluxbox ;;
     *) exit 1 ;;
 esac
 

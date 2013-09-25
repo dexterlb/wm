@@ -10,6 +10,8 @@ case "$1" in
 esac
 
 if [[ -n "${cmd}" ]]; then
+    echo "${cmd}" -f -fn "$xft" -nb "#${pa_default[2]}" -nf "#${pa_default[1]}" \
+        -sb "#${pa_default[2]}" -sf "#${pa_hl[1]}" -h "$pa_height" -p "$2"
     "${cmd}" -f -fn "$xft" -nb "#${pa_default[2]}" -nf "#${pa_default[1]}" \
         -sb "#${pa_default[2]}" -sf "#${pa_hl[1]}" -h "$pa_height" -p "$2"
 fi

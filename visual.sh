@@ -15,8 +15,9 @@ pa_active=( "${col_hl}" '')
 pa_inactive=( "${col_inactive}" '')
 
 # several things assume that the font is monospace: fixme
-pa_font='-*-droid sans mono-*-*-*-*-14-*-*-*-*-*-*-*'
-xft='Droid Sans Mono-10'
+xft='Droid Sans Mono-12'
+#pa_font="${xft}"
+pa_font='-*-droid sans mono-*-*-*-*-15-*-*-*-*-*-*-*'
 
 
 . ~/.mpd_data.sh
@@ -33,7 +34,7 @@ escgeometry="$(echo "${geometry[@]}" | perl -pe 's/ /_/g')"
 # geometry has the format: WxH+X+Y
 pa_x=${geometry[1]}
 pa_y=${geometry[2]}
-pa_height=20
+pa_height=24
 pa_width=${geometry[3]}
 
 imgdir="${cdir}/images"

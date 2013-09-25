@@ -1,6 +1,7 @@
 #!/bin/zsh
 cdir="$(readlink -f "$(dirname "${0}")")"
 . "${cdir}/visual.sh"
+. "${cdir}/interfaces.sh"
 
 # this is a simple config for herbstluftwm
 
@@ -41,7 +42,7 @@ ha keybind $Mod-Shift-p spawn gmrun
 ha keybind $Mod-v       spawn pavucontrol
 ha keybind $Mod-Shift-b spawn firefox
 ha keybind $Mod-Shift-t spawn ts
-ha keybind $Mod-Shift-i spawn xchat
+ha keybind $Mod-Shift-i spawn hexchat
 
 ha keybind Print        spawn zsh -c 'sleep 0.4; scrot -d 0.1 /tmp/s$(date -u +%s).png' 
 ha keybind Shift-Print  spawn zsh -c 'sleep 0.4; scrot -d 0.1 -s /tmp/s$(date -u +%s).png' 
@@ -158,9 +159,9 @@ ha rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK)' manage=off
 ha rule class~'([Vv]lc|[Mm]player)' tag=9
 ha rule class~'(Firefox|[Cc]hromium|[Cc]hrome)' tag=2
 ha rule instance~'dwb' tag=2
-ha rule instance~'(hon-x86|explorer\.exe)' tag=6
-ha rule instance~'xchat' tag=3
-ha rule instance~'ts3client_linux_x86' tag=4
+ha rule instance~'(hon-x86|hon-x86_64|explorer\.exe)' tag=6
+ha rule instance~'(xchat|hexchat)' tag=3
+ha rule instance~'ts3client_linux_(x86|amd64)' tag=4
 
 
 herbstclient set tree_style '╾│ ├└╼─┐'
@@ -184,7 +185,7 @@ flush &
     xset b off              # speakerectomy
     xset s off              # no screensaver
     xset s noblank          # no screen blanking
-    xset m 5/1 4            # mouse acceleration and speed
+    xset m 3/1 0            # mouse acceleration and speed
     xset -dpms; xset s off  # no screen blanking
     xhost local:boinc       # allow boinc user to use GPU
 
