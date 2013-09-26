@@ -1,7 +1,7 @@
 #!/bin/zsh
 dir="$(dirname "$0")"
 
-res=$(echo -e "restart\nhalt\nquit\ncancel" \
+res=$(echo -e "lock\nsuspend\nrestart\nhalt\nquit\ncancel" \
     | "$dir/dmenu.sh" stdin "manage session")
 
 function killx {
@@ -21,5 +21,15 @@ case ${res} in
         killx
         exit 0
         ;;
-    *) ;;
+    'suspend')
+        physlock & systemctl suspend
+        exit 0
+        ;;
+    'lock')
+        physlock
+        exit 0
+        ;;
+    *)
+        echo "wut?"
+        ;;
 esac

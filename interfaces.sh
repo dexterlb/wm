@@ -33,6 +33,13 @@ function get_loadavg {
     echo "loadavg ${cload}"
 }
 
+function get_brightness {
+    local br
+    cat /sys/class/backlight/intel_backlight/brightness \
+        | perl -pe 's/.$//' | read br   # divide by 10
+    echo "brightness $(dclr ${pa_hl})b${br}$(dclr)"
+}
+
 function touch_state {
     synclient -l | grep TouchpadOff | cut -c31-32
 }
@@ -43,16 +50,6 @@ function touch_set {
 
 function touch_toggle {
     touch_set $(( ! $(touch_state) ))
-}
-
-function brightness {
-    local br
-    br="/sys/class/backlight/intel_backlight"
-    cat "${br}/brightness"
-}
-
-function get_brightness {
-    echo "brightness $(brightness)"
 }
 
 function showminutes {

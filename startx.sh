@@ -24,7 +24,7 @@ function xinteractive {
     echo -en "\n"
 
     if [[ -z "$1" ]]; then
-        echo -n "Enter choice (hl: 1, fluxbox: 2, lock: l, restart: r, halt: h, console: c): "
+        echo -n "Enter choice (hl: 1, fluxbox: 2, restart: r, halt: h, console: c): "
         read c
     else
         c="$1"
@@ -36,7 +36,6 @@ function xinteractive {
         1) xs hl ;;
         2) xs fluxbox ;;
        
-        l) vlock -a ; zsh -l -c '{ sleep .5 ; chvt 1 } &'; exit ;;
         r) systemctl reboot ;;
         h) systemctl poweroff ;;
         c) return ;;
@@ -54,8 +53,6 @@ function xauto {
     if [[ -z $DISPLAY ]] && [[ $(tty) =~ "/dev/tty[1-9]" ]]; then
         if [[ $(tty) = "/dev/tty1" ]] && [[ ! -f ~/x_noauto ]]; then
             xinteractive 1
-        elif [[ $(tty) = "/dev/tty5" ]]; then
-            xinteractive l
         else
             xinteractive
         fi

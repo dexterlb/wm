@@ -14,11 +14,9 @@ else
     dzen2_svn=""
 fi
 
-function uniq_linebuffered {
-    awk -W interactive '$0 != l { print ; l=$0 ; fflush(); }' "$@"
-}
-
 function suicide {
+    rm -rf /tmp/panelwatch
+    kill ${childpids[@]}
     sleep 1 &
     kill -- -$(ps opgid= "$!")
 }
@@ -40,10 +38,21 @@ function join {
     done
 }
 
+function uniq_linebuffered {
+    awk -W interactive '$0 != l { print ; l=$0 ; fflush(); }' "$@"
+}
+
 function watchloop {
+    local spid sstat
     while true; do
         ${@:2}
-        sleep ${1} || break
+        sleep ${1} &
+        spid=$!
+        mkdir -p /tmp/panelwatch
+        echo "${spid}" > "/tmp/panelwatch/${@:2}"
+        wait "${spid}"
+        sstat=$?
+        if [[ ${sstat} =~ '^(138|0)$' ]] || break
     done > >(uniq_linebuffered)
 }
 
@@ -91,8 +100,10 @@ herbstclient pad $monitor $pa_height
     watchloop 5 get_loadavg &
     childpids+=( $! )
 
+    watchloop 5 get_brightness &
+    childpids+=( $! )
+
     herbstclient --idle
-    kill ${childpids[@]}
     suicide
 } 2>/dev/null | {
 
@@ -101,6 +112,7 @@ herbstclient pad $monitor $pa_height
     loadavg=""
     date=""
     mpd_str=""
+    brightness=""
     notification=""
     windowtitle=""
     bordercolor="#$pa_outl"
@@ -152,7 +164,7 @@ herbstclient pad $monitor $pa_height
         if [[ -n "${notification}" ]]; then
             right="${notification} ";
         else
-            right="${mpd_str} ${date} ${battery} ${loadavg} "
+            right="${mpd_str} ${date} ${battery} ${brightness} ${loadavg} "
         fi
 
         rightwidth=$(pawidth "${right}")
@@ -228,6 +240,10 @@ herbstclient pad $monitor $pa_height
             notif)
                 notification="${cmd[@]:1}"
                 echo "notif: ${notification}" >&2
+                ;;
+            brightness)
+                brightness="${cmd[@]:1}"
+                echo "brightness: ${brightness}" >&2
                 ;;
             mpd)
                 mpd_str="${cmd[@]:1}"
