@@ -262,7 +262,7 @@ herbstclient pad $monitor $pa_height
                 ;;
         esac
     done
-# } 2> /dev/null \
 # } \
-} 2>/tmp/dzen_msg | tee /tmp/dzen_debug \
+# } 2>/tmp/dzen_msg | tee /tmp/dzen_debug \
+} 2> /dev/null \
     | dzen2 -w $pa_width -x $pa_x -y $pa_y -ta l ${dzen_common[@]}
