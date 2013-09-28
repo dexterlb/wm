@@ -8,6 +8,8 @@ function pafit {
     rm -f /tmp/temp_img
 }
 
+mkdir -p "${bakeddir}"
+
 # bake wallpaper
 convert "${src_wallpaper}" "${baked_wallpaper}"
 
