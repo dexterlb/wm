@@ -49,7 +49,7 @@ function watchloop {
         sleep ${1} &
         spid=$!
         mkdir -p /tmp/panelwatch
-        echo "${spid}" > "/tmp/panelwatch/${@:2}"
+        echo "${spid}" > "/tmp/panelwatch/${(j:_:)@:2}"
         wait "${spid}"
         sstat=$?
         if [[ ${sstat} =~ '^(138|0)$' ]] || break
