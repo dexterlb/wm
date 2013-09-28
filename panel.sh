@@ -103,6 +103,9 @@ herbstclient pad $monitor $pa_height
     watchloop 5 get_brightness &
     childpids+=( $! )
 
+    watchloop 3 get_gpu &
+    childpids+=( $! )
+
     herbstclient --idle
     suicide
 } 2>/dev/null | {
@@ -113,6 +116,7 @@ herbstclient pad $monitor $pa_height
     date=""
     mpd_str=""
     brightness=""
+    gpu=""
     notification=""
     windowtitle=""
     bordercolor="#$pa_outl"
@@ -164,7 +168,7 @@ herbstclient pad $monitor $pa_height
         if [[ -n "${notification}" ]]; then
             right="${notification} ";
         else
-            right="${mpd_str} ${date} ${battery} ${brightness} ${loadavg} "
+            right="${mpd_str} ${date} ${gpu}${battery} ${brightness} ${loadavg} "
         fi
 
         rightwidth=$(pawidth "${right}")
@@ -248,6 +252,13 @@ herbstclient pad $monitor $pa_height
             mpd)
                 mpd_str="${cmd[@]:1}"
                 echo "mpd: ${mpd_str}" >&2
+                ;;
+            gpu)
+                gpu="${cmd[@]:1}"
+                if [[ -n "${gpu}" ]]; then
+                    gpu="${gpu} "
+                fi
+                echo "gpu: ${mpd_str}" >&2
                 ;;
         esac
     done

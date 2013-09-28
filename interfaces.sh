@@ -40,6 +40,20 @@ function get_brightness {
     echo "brightness $(dclr ${pa_hl})b${br}$(dclr)"
 }
 
+function get_gpu {
+    local state str
+    cat /proc/acpi/bbswitch | perl -pe 's/[^ONF]*//' | read state
+    case "${state}" in
+        ON)
+            str="$(dclr ${pa_hl2})G$(dclr)"
+            ;;
+        OFF)
+            str=""
+            ;;
+    esac
+    echo "gpu ${str}"
+}
+
 function touch_state {
     synclient -l | grep TouchpadOff | cut -c31-32
 }
