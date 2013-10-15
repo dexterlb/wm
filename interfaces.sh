@@ -102,7 +102,7 @@ function get_battery {
                 else
                     tclr="$(dclr ${pa_u})"
                 fi
-                chgstr="$(dclr)~${current}mA~${tclr}$(showminutes "${timeleft}")"
+                chgstr="$(dclr)/${current}mA=${tclr}$(showminutes "${timeleft}")"
                 ;;
             *) clr="$(dclr ${pa_u})" ;;
         esac
