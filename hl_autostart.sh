@@ -110,7 +110,7 @@ ha mousebind $Mod-Button2 resize
 ha mousebind $Mod-Button3 zoom
 
 # focus
-ha keybind $Mod-BackSpace   cycle_monitor
+ha keybind $Mod-grave       cycle_monitor
 ha keybind $Mod-Tab         cycle_all +1
 ha keybind $Mod-Shift-Tab   cycle_all -1
 # ha keybind $Mod-c cycle
