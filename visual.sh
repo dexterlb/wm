@@ -43,7 +43,7 @@ bakeddir="${imgdir}/baked"
 srcdir="${imgdir}/src"
 
 baked_wallpaper="${bakeddir}/wallpaper.png"
-src_wallpaper="${srcdir}/wallpaper/portal_coop_desat.png"
+src_wallpaper="${srcdir}/wallpaper/machinarium_band.jpg"
 baked_panelbg="${bakeddir}/panelbg_${escgeometry}.xpm"
 baked_panelbg_notif="${bakeddir}/panelbg_notif_${escgeometry}.xpm"
 src_logo="${srcdir}/logo.png"
