@@ -11,7 +11,8 @@ function xs {
     fi
 
     echo "starting X with parameter $1"
-    startx "$xinitrc" "$1" -- "$vt" &> /tmp/x_out
+    startx "$xinitrc" "$1" -- "$vt" # &> /tmp/x_out
+    # bug in X: redirecting stderr crashes it ^^^
 
     clear
     echo "X has exited. Output has been saved to /tmp/x_out."
