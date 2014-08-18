@@ -91,8 +91,8 @@ herbstclient pad $monitor $pa_height
     } 3>&1 2>/dev/null &
     childpids+=( $! )
 
-    watchloop 2 get_battery 1 &
-    childpids+=( $! )
+    # watchloop 2 get_battery 1 &
+    # childpids+=( $! )
 
     watchloop 5 get_binclock &
     childpids+=( $! )
@@ -100,11 +100,11 @@ herbstclient pad $monitor $pa_height
     watchloop 5 get_loadavg &
     childpids+=( $! )
 
-    watchloop 5 get_brightness &
-    childpids+=( $! )
+    # watchloop 5 get_brightness &
+    # childpids+=( $! )
 
-    watchloop 3 get_gpu &
-    childpids+=( $! )
+    # watchloop 3 get_gpu &
+    # childpids+=( $! )
 
     herbstclient --idle
     suicide
@@ -168,7 +168,7 @@ herbstclient pad $monitor $pa_height
         if [[ -n "${notification}" ]]; then
             right="${notification} ";
         else
-            right="${mpd_str} ${date} ${gpu}${battery} ${brightness} ${loadavg} "
+            right="${mpd_str} ${date} ${loadavg} "
         fi
 
         rightwidth=$(pawidth "${right}")
