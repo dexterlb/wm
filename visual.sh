@@ -62,7 +62,8 @@ function imgwidth {
     echo "${width}"
 }
 
-charwidth=$(textwidth "${pa_font}" a)
+# charwidth=$(textwidth "${pa_font}" a)
+charwidth=9 # !!!! fixme: this is hardcoded !!!!
 
 function mono_textwidth {
     echo $(( charwidth * $(echo -n "${1}" | wc -m) ))
